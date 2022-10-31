@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ Clustering-related deployers
+$Id:$
+-->
+<deployment xmlns="urn:jboss:bean-deployer:2.0">
+   
+   <!-- Policy for converting HAPartition names into MC dependency names -->
+   <bean name="HAPartitionDependencyCreator" 
+         class="org.jboss.ha.framework.server.deployers.DefaultHAPartitionDependencyCreator"/>
+         
+   <!--  Adds a dependency on the appropriate HAPartition to clustered EJB2 beans. -->
+   <bean name="Ejb2HAPartitionDependencyDeployer" 
+         class="org.jboss.ha.framework.server.deployers.Ejb2HAPartitionDependencyDeployer">         
+      <property name="haPartitionDependencyCreator"><inject bean="HAPartitionDependencyCreator"/></property>
+   </bean>
+   
+   <!--  Adds a dependency on the appropriate HAPartition to clustered EJB3 beans. -->
+   <bean name="Ejb3HAPartitionDependencyDeployer" 
+         class="org.jboss.ha.framework.server.deployers.Ejb3HAPartitionDependencyDeployer">         
+      <property name="haPartitionDependencyCreator"><inject bean="HAPartitionDependencyCreator"/></property>
+   </bean>
+
+</deployment>

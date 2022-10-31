@@ -1,0 +1,167 @@
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Why Messaging?
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Reliability: 
+--------------------
+One application can send out messages, the Producer and the Consumer might not even be running. But at some point in the future, when the consumers starts up, it can then read the messages. Or the consumer crashes while it's processing the messages. When the consumer starts again, those messages will still be there to be consumed so we can guarantee delivery of messages.
+
+Integration: 
+--------------------
+We can write these applications on different platforms using different languages as long as they follow the same messaging protocol. Then these applications can be integrate. 
+
+Scalability: 
+--------------------
+If I just broadcast a message, drop that message on to a queue somewhere I can have many many listners picking up that message and doing work based on that message.
+
+Flexibility: 
+--------------------
+We can introduce different types of listners to consume these messages and these listners could do different things in different ways. They could be written in different languages, they can perform different processing, they can talk to different databases. And it's much easier to add a new consumer. 
+
+JMS is Java API over a messaging system. JMS is similar to JDBC: Like the JDBC API that can be used to access different relational databases, the JMS API provides vendor independent access to Enterprise Messaging Systems like JBOSS Messaging, Websphere MQ, BEA Weblogic...
+
+There are many implementations:
+	- GlassFish (by Oracle) -> This is a JMS server and is part of Standard J2EE 7 toolkit.
+	- WildFly -> Other implementation from JBoss
+	- Websphere MQ -> by IBM
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+JMS 1.1
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+This was releaed in 2002.
+This is relatively simple API for messaging system.
+
+JMS 2.0 was released in 2013.
+- The driving force for 2.0 version is to simplify the 1.1 API.
+- Other improvements.
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+JMS DIAGRAM
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+	+------------+                                                            
+	| JMS CLIENT | (Producer)	
+    +------------+
+              | 
+	          |
+	        +-V---------------------------------------+      
+	        |                                         |            +----------+
+	        |         JMS PROVIDER                    <----------> |JMS CLIENT| (Producer/ Consumer)
+	        |(JBOSS Msgng, Websphere MQ, BEA Weblogic)|            +----------+
+	        +-----------------------------------------+                  
+             |
+	         |  
+	+--------V---+                 
+	| JMS CLIENT |  (Consumer)                                
+	+------------+
+
+
+Q) What is a JMS Client?
+A) A Java application that uses JMS. 
+
+Q) What is a JMS Provider?
+A) This is a Messaging System that handles routing and delivery of messages.
+
+Q) What is a JMS Application?
+A) It is a business system composed of many JMS clients & usually one JMS provider.
+
+Q) What is a Producer?
+A) A JMS client that send messages.
+
+Q) What is a Consumer?
+A) A JMS client that receive messages.
+
+A JMS client can send messages and receive messages.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Modes Of Operation
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. Point-to-Point:
+	In this Publisher, publishes the messages and a single consumer takes the messages. There can be multiple consumers, but message can be consumed only once. Let's say we have 5 consumers, amd one consumer takes the nessage and the other consumers cannot see that message.
+
+2. Publish and Subscribe:
+	Multiple consumers share messages. So, we may have one publisher. The publisher publishes a message called as Topic. Multiple consumers can consume that message. 
+	
+As far as JMS goes, there are similarities across these APIS. APIs are similar for both modes.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+POINT TO POINT (ONE -> ONE)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                         
+						                            +-------------------+
+                                                    | POSSIBLE RECEIVER |
+                                                    +-------------------+
+                                   
+	+-----------+           +-----------+           +-------------------+
+	|  SENDER   |---------->|   QUEUE   |           | POSSIBLE RECEIVER |
+	+-----------+           +-----------+           +-------------------+
+                                  |
+                                  |
+                                  |                 +-------------------+
+                                  +---------------->| POSSIBLE RECEIVER |
+                                                    +-------------------+
+													
+
+
+Senders/ Publishers
+Receivers/ Consumers
+
+	+--------+                                                +-----------+
+	| Sender |                                                | Receiver  |
+	+--------+   +---------------QUEUE---------------------+  +-----------+
+	    |        |  +-----+ +-----+                        |
+	    +--------+->|MSG  | |MSG2 |                        |
+	             |  +-----+ +-----+                        |
+	+--------+   +------------A----------------------------+  +-----------+
+	| Sender |________________|                               | Receiver  |
+	+--------+                                                +-----------+
+
+We can have muliple senders sending messges to the same queue and also we can have multiple receivers receiving messages from that queue.
+And then one of the receiver will take out the message from the queue.
+And this is in First In First Out order.
+Only one can pick the message from queue.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+PUBLISH AND SUBSCRIBE (1 -> MANY or can be MANY -> MANY)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                         
+						                            +------------+
+                                  +---------------->| SUBSCRIBER |
+                                  |                 +------------+ 
+                                  |
+	+-----------+           +-----------+           +------------+
+	| PUBLISHER |---------->|   TOPIC   |---------->| SUBSCRIBER |
+	+-----------+           +-----------+           +------------+
+                                  |
+                                  |
+                                  |                 +------------+
+                                  +---------------->| SUBSCRIBER |
+                                                    +------------+
+													
+Senders/ Publishers
+Receivers/ Consumers
+
+	+----------+                                                +-----------+
+	|Publisher |                                                | Subscriber|
+	+----------+ +---------------TOPIC---------------------+    +-----------+
+	    |        |  +-----+ +-----+                        |
+	    +--------+->|MSG  | |MSG2 |                        |
+	             |  +-----+ +-----+                        |
+   +---------+   +------------A----------------------------+  +-----------+
+   |Publisher|________________|                               | Subscriber|
+   +---------+                                                +-----------+

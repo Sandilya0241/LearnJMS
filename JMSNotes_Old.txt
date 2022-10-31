@@ -1,0 +1,246 @@
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Why Messaging?
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Reliability: 
+--------------------
+One application can send out messages, the Producer and the Consumer might not even be running. But at some point in the future, when the consumers starts up, it can then read the messages. Or the consumer crashes while it's processing the messages. When the consumer starts again, those messages will still be there to be consumed so we can guarantee delivery of messages.
+
+Integration: 
+--------------------
+We can write these applications on different platforms using different languages as long as they follow the same messaging protocol. Then these applications can be integrate. 
+
+Scalability: 
+--------------------
+If I just broadcast a message, drop that message on to a queue somewhere I can have many many listners picking up that message and doing work based on that message.
+
+Flexibility: 
+--------------------
+We can introduce different types of listners to consume these messages and these listners could do different things in different ways. They could be written in different languages, they can perform different processing, they can talk to different databases. And it's much easier to add a new consumer. 
+
+JMS is Java API over a messaging system. JMS is similar to JDBC: Like the JDBC API that can be used to access different relational databases, the JMS API provides vendor independent access to Enterprise Messaging Systems like JBOSS Messaging, Websphere MQ, BEA Weblogic...
+
+There are many implementations:
+	- GlassFish (by Oracle) -> This is a JMS server and is part of Standard J2EE 7 toolkit.
+	- WildFly -> Other implementation from JBoss
+	- Websphere MQ -> by IBM
+
+
+A java application can Publish messages and Consume messages.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Modes Of Operation
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. Point-to-Point:
+	In this Publisher, publishes the messages and a single consumer takes the messages. There can be multiple consumers, but message can be consumed only once. Let's say we have 5 consumers, amd one consumer takes the nessage and the other consumers cannot see that message.
+
+2. Publish and Subscribe:
+	Multiple consumers share messages. So, we may have one publisher. The publisher publishes a message called as Topic. Multiple consumers can consume that message. 
+	
+As far as JMS goes, there are similarities across these APIS. APIs are similar for both modes.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+POINT TO POINT
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Senders/ Publishers
+Receivers/ Consumers
+
+	+--------+                                                +-----------+
+	| Sender |                                                | Receiver  |
+	+--------+   +---------------QUEUE---------------------+  +-----------+
+	    |        |  +-----+ +-----+                        |
+	    +--------+->|MSG  | |MSG2 |                        |
+	             |  +-----+ +-----+                        |
+	+--------+   +------------A----------------------------+  +-----------+
+	| Sender |________________|                               | Receiver  |
+	+--------+                                                +-----------+
+
+We can have muliple senders sending messges to the same queue and also we can have multiple receivers receiving messages from that queue.
+And then one of the receiver will take out the message from the queue.
+And this is in First In First Out order.
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+PUBLISH AND SUBSCRIBE
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Senders/ Publishers
+Receivers/ Consumers
+
+	+----------+                                                +-----------+
+	|Publisher |                                                | Subscriber|
+	+----------+ +---------------TOPIC---------------------+    +-----------+
+	    |        |  +-----+ +-----+                        |
+	    +--------+->|MSG  | |MSG2 |                        |
+	             |  +-----+ +-----+                        |
+   +---------+   +------------A----------------------------+  +-----------+
+   |Publisher|________________|                               | Subscriber|
+   +---------+                                                +-----------+
+
+We can have muliple senders sending messges to the same queue and also we can have multiple receivers receiving messages from that queue.
+Now if publisher publishes a message to queue, each subcriber get that message.
+When all subscribers have seen this message (can be looked into this in more detail later), message will be deleted from that queue.
+
+Subscribers can be:
+	Durable/ Transient.
+	Attached/ Dettached.
+
+What is Transient Subscriber?
+	It is one that starts up, consumes messages and goes away again. If messages have published when that subscriber isn't running, that subscriber will not see those messages. 
+	
+What is Durable Subscriber?
+	It starts up, consumes messages and can then goes away. If messages have published when that subscriber isn't running, when that subscriber starts again it will get to see those messages.
+
+Attached/ Dettached subscriber: This is just says whether my subscriber is currently running or not. Attached subscriber is one that is running and attached to the topic. Dettached subscribers are one that is running and has not yet attached to the topic or obvisiouly that are not running.
+
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+INITIALIZING JMS AND SENDING THE FIRST MESSAGE
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+TOPICS COVERED:
+	- ADMINISTERED OBJECTS
+		These are setup inside the JNDI(JAVA NAMING DIRECTORY INTERFACE) subsystem. These objects have names and we use these names to get access to these objects inside our JMS code.
+	- JMS 1.1:
+		How to write code using JMS 1.1.
+	- JMS 2.0
+	
+JMS defines two modes of operation:
+	point-to-point:
+		consumer takes messages.
+	publish and subscribe:
+		where as consumer is copying a message that consumer reaches into the topic.
+
+Both these APIs are syntactically and semantically similar.
+	- Both of them are inherited from same base class. So, we can make use of base class to do the work.
+	
+Programming Model:
+	- Factories: 
+		Factory we obtain from JNDI. So, we make a call to JNDI and we give the name of a factory and it gives us back an object that represents the factory. We then use our factory to create the other things that we want to use as part of our JMS application
+		* To use factory to create the Topics.
+		* To use factory to create Queues. 
+		* Then we can send messages to Topics and Queues.
+	- Connections:
+		Once we have a factory, we obtain a connection. And the connection is the physical connection to the JMS Provider.
+		We can leave the connection as open. The connection can live as long as the application. We keep using that connection within the application.
+	- Sessions:
+		* We send and receive messages as part of the session. We have to be certainly careful about sessions because they are thread scoped. 
+		* So, if we have multiple threads and our application. We should not share the session across threads. 
+		* If we did that, we need to try setup our own thread safety mechanisms to manage that.
+		* However, it's perfect reasonable to create one session/ thread. That's the preferred model when we use JMS.
+
+
+To do point-to-point programming in JMS, we  use something call queues.
+
+And to for Publish and Subscribe, we use topics.
+
+Both of these are retrieved from JNDI.
+
+So, JNDI has this concept of what as known as administered objects. They are called administered objects because they are typically setup by system administrators. They are not setup by the programmers.
+
+Both factories and destinations or topics and queues are registered as part of JNDI setup.
+
+	
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+JMS 1.1
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+This was releaed in 2002.
+This is relatively simple API for messaging system.
+
+JMS 2.0 was released in 2013.
+- The driving force for 2.0 version is to simplify the 1.1 API.
+- Other improvements.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*Refer if required*/
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Glassfish Console
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Inside console, we have Resources section. Inside that section, we have JMS Resources.
+Resources
+	|
+	+----> JMS Resources.
+				|
+				+-------> Connection Factories
+								|
+								+-------------> jms/__defaultConnectionFactory
+								
+
+
+Steps to implement logic:
+-----------------------------------------------
+	- Whatever version that we are writing in, we need to use JNDI.
+	- In JNDI, first thing we need to do is to create "InitialContext" object.
+	- Call from and to "InitialContext" might throw exceptions. So, we need to handle them (Exception class : NamingException).
+	- This "InitialContext" has to be initialized somehow. So, when we call "new InitialContext()" and create a new instance of this class, we have to tell our JNDI implementation how to connect to JNDI server and the other information that it needs.
+	- This can be done in couple of ways:
+		= We could call "new InitialContext()" and pass it various parameter to tell it what to do.
+		= Or we can create a properties file and inside that properties file provide the information that the JNDI client needs to connect to the JNDI server.
+	- Once after connecting to that JNDI server, we can lookup for the queue that we want to use.
+	- We have an Admin Object in glassfish called P2PQueue. Its JMS name is "jms/P2PQueue".
+	- So, InitialContext.lookup will give us the reference to this queue. And we can publish messages to this queue.
+	- We also need a reference to the ConnectionFactory. This is also fetched from InitialContext.lookup().
+	- In JMS 1.1, we need to do two more things. We need to create a connection from ConnectionFactory. And from that connection, we get a Session.
+	- createSession method takes two parameters:
+		= The first parameter says is this section, transacted? We pass "false". These details are available in this Notes.
+		= The second parameter says how we acknowledge messages. Possible values are (AUTO, DUPLICATE_OK and CLIENT).
+	- We should close our connection, once we are finished with that.
+	- To produce a message, we use the session object. createProducer(<QueueName>) is the method name to produce messages.
+	- To create a Message, we use session object and we have couple of options like createTextMessage(), createStreamMessage(), createObjectMessage().
+	- Once we have message, we can use messageProducer object to send the message.
+	
+		
+	
